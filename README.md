@@ -17,7 +17,7 @@ vitis_hls -f script.tcl
 cd ..../workspace
 
 #Modify this line as needed in project_1.tcl to set a new project name/directory
-# set _xil_proj_name_ "4t4t8c"
+#set _xil_proj_name_ "4t4t8c"
 
 #RTL implementation and bitstream generation
 vivado -mode batch -source project_1.tcl  
