@@ -1,19 +1,17 @@
 GFADES sources and data
 
 Steps to run full implementation with a base design with one thread and 2 compute units.
+copy the contents of this repository under a directory named workspace
+setup path to Vitis tools, for example
 
-#copy the contents of this repository under a directory named workspace
+**module load vitis/2022.1**
 
-#setup path to Vitis tools, for example
+or
 
-module load vitis/2022.1
+**source <path to tools>/Xilinx/Vitis/2022.1/settings64-Vitis.sh**
 
-#or
-
-source <path to tools>/Xilinx/Vitis/2022.1/settings64-Vitis.sh
-
-#edit matrix.h in the src directory and verify the following lines so the hardware is generated
-#with 1 hardware thread and 2 compute units per thread
+edit matrix.h in the src directory and verify the following lines so the hardware is generated
+with 1 hardware thread and 2 compute units per thread
 
 #define FEA_THREADS 1
 #define ADJ_THREADS 1
@@ -21,16 +19,16 @@ source <path to tools>/Xilinx/Vitis/2022.1/settings64-Vitis.sh
 #define B_WIDTH_BLOCK 2 
 #define C_WIDTH_BLOCK 2
 
-#now go to hls solution directory
+now go to hls solution directory
 
-cd ..../workspace/gnn-rfsoc-mt-all-2022/hls/gnn/solution1
+**cd ..../workspace/gnn-rfsoc-mt-all-2022/hls/gnn/solution1**
 
-#check script.tcl to make sure that the set_part command matches your device is correct or modify as needed.
-#perform HLS simulation, HLS synthesis and IP export with this conmmand
+check script.tcl to make sure that the set_part command matches your device is correct or modify as needed.
+perform HLS simulation, HLS synthesis and IP export with this conmmand
 
-vitis_hls -f script.tcl 
+**vitis_hls -f script.tcl **
 
-#HLS simulation should display results like this
+HLS simulation should display results like this:
 
 out :data index= 0 0 kernel = 0.00196838
 out :data index= 0 1 kernel = 0.477783
@@ -43,17 +41,17 @@ out :data index= 0 7 kernel = 0.0110474
 out :data index= 0 8 kernel = 0.114624
 out :data index= 0 9 kernel = 0.71582
 
-#Then wait for HLS synthesis and IP export to complete.
-#once this is done go to Vivado script directory
+Then wait for HLS synthesis and IP export to complete.
+once this is done go to Vivado script directory
 
-cd ..../workspace
+**cd ..../workspace**
 
-#Modify this line as needed in project_1.tcl to set a new project name/directory 
+Modify this line as needed in project_1.tcl to set a new project name/directory 
 
-#set _xil_proj_name_ "4t4t8c"
+**set _xil_proj_name_ "4t4t8c"**
 
-#RTL implementation and bitstream generation
+RTL implementation and bitstream generation
 
-vivado -mode batch -source project_1.tcl  
+**vivado -mode batch -source project_1.tcl**  
 
-#after completion all results are available under the new project name directory
+after completion all results are available under the new project name directory.
