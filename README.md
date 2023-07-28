@@ -24,21 +24,30 @@ now go to hls solution directory
 **cd ..../workspace/gnn-rfsoc-mt-all-2022/hls/gnn/solution1**
 
 check script.tcl to make sure that the set_part command matches your device is correct or modify as needed.
-perform HLS simulation, HLS synthesis and IP export with this conmmand
+perform HLS simulation, HLS synthesis and IP export with this command:
 
-**vitis_hls -f script.tcl **
+**vitis_hls -f script.tcl**
 
 HLS simulation should display results like this:
 
 out :data index= 0 0 kernel = 0.00196838
+
 out :data index= 0 1 kernel = 0.477783
+
 out :data index= 0 2 kernel = 0.59668
+
 out :data index= 0 3 kernel = 0.0311279
+
 out :data index= 0 4 kernel = 0.0022583
+
 out :data index= 0 5 kernel = 0.564453
+
 out :data index= 0 6 kernel = 0.53125
+
 out :data index= 0 7 kernel = 0.0110474
+
 out :data index= 0 8 kernel = 0.114624
+
 out :data index= 0 9 kernel = 0.71582
 
 Then wait for HLS synthesis and IP export to complete.
