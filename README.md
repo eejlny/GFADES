@@ -25,8 +25,9 @@ now go to hls solution directory
 
 **cd ..../workspace/gnn-rfsoc-mt-all-2022/hls/gnn/solution1**
 
-check script.tcl to make sure that the set_part command matches your device is correct or modify as needed.
-perform HLS simulation, HLS synthesis and IP export with this command:
+Check script.tcl to make sure that the set_part command matches your device is correct or modify as needed.
+The default part is xczu27dr-ffve1156-2-i that is the FPGA available in an RFSOC2x2 board.
+Perform HLS simulation, HLS synthesis and IP export with this command:
 
 **vitis_hls -f script.tcl**
 
