@@ -1,21 +1,50 @@
 GFADES sources and data
 
-Steps to run full implementation
+Steps to run full implementation with a base design with one thread and 2 compute units.
 
-#copy the contents of this repository under a workspace directory
+#copy the contents of this repository under a directory named workspace
 
-#setup path to tools, for example
+#setup path to Vitis tools, for example
+
 module load vitis/2022.1
 
-#go to hls solution directory
+#or
+
+source <path to tools>/Xilinx/Vitis/2022.1/settings64-Vitis.sh
+
+#edit matrix.h in the src directory and verify the following lines so the hardware is generated
+#with 1 hardware thread and 2 compute units per thread
+
+#define FEA_THREADS 1
+#define ADJ_THREADS 1
+
+#define B_WIDTH_BLOCK 2 
+#define C_WIDTH_BLOCK 2
+
+#now go to hls solution directory
 
 cd ..../workspace/gnn-rfsoc-mt-all-2022/hls/gnn/solution1
 
-#HLS syn and IP export
+#check script.tcl to make sure that the set_part command matches your device is correct or modify as needed.
+#perform HLS simulation, HLS synthesis and IP export with this conmmand
 
 vitis_hls -f script.tcl 
 
-#go to Vivado script directory
+#HLS simulation should display results like this
+
+out :data index= 0 0 kernel = 0.00196838
+out :data index= 0 1 kernel = 0.477783
+out :data index= 0 2 kernel = 0.59668
+out :data index= 0 3 kernel = 0.0311279
+out :data index= 0 4 kernel = 0.0022583
+out :data index= 0 5 kernel = 0.564453
+out :data index= 0 6 kernel = 0.53125
+out :data index= 0 7 kernel = 0.0110474
+out :data index= 0 8 kernel = 0.114624
+out :data index= 0 9 kernel = 0.71582
+
+#Then wait for HLS synthesis and IP export to complete.
+#once this is done go to Vivado script directory
 
 cd ..../workspace
 
