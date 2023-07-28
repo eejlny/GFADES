@@ -1,8 +1,8 @@
 GFADES sources and data
 
 Steps to run full implementation with a base design with one thread and 2 compute units.
-copy the contents of this repository under a directory named workspace
-setup path to Vitis tools, for example
+Copy the contents of this repository under a directory named workspace
+setup path to Vitis tools, for example:
 
 **module load vitis/2022.1**
 
