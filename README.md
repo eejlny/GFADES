@@ -12,7 +12,7 @@ or
 
 **source <path to tools>/Xilinx/Vitis/2022.1/settings64-Vitis.sh**
 
-edit matrix.h in the src directory and verify the following lines so the hardware is generated
+edit matrix.h located the gnn-rfsoc-mt-all-2022/src directory and verify the following lines so the hardware is generated
 with 1 hardware thread and 2 compute units per thread
 
 #define FEA_THREADS 1
