@@ -59,7 +59,7 @@ once this is done go to Vivado script directory
 
 Modify this line as needed in project_1.tcl to set a new project name/directory 
 
-**set _xil_proj_name_ "4t4t8c"**
+**set _xil_proj_name_ "1t1t2c"**
 
 RTL implementation and bitstream generation
 
