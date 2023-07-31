@@ -66,4 +66,10 @@ RTL implementation and bitstream generation
 
 **vivado -mode batch -source project_1.tcl**  
 
-after completion all results are available under the new project name directory.
+after completion all results are available under the new project name directory. 
+Also, you can open and work with the projects using the GUI for Vitis HLS and VIVADO located at: 
+
+VITIS HLS: ..../workspace/gnn-rfsoc-mt-all-2022/hls/gnn
+
+VIVADO: ..../workspace/<project_name/
+
