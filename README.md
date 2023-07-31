@@ -16,9 +16,11 @@ edit matrix.h located the gnn-rfsoc-mt-all-2022/src directory and verify the fol
 with 1 hardware thread and 2 compute units per thread
 
 #define FEA_THREADS 1
+
 #define ADJ_THREADS 1
 
 #define B_WIDTH_BLOCK 2 
+
 #define C_WIDTH_BLOCK 2
 
 now go to hls solution directory
