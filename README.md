@@ -13,7 +13,8 @@ or
 **source <path to tools>/Xilinx/Vitis/2022.1/settings64-Vitis.sh**
 
 edit matrix.h located the gnn-rfsoc-mt-all-2022/src directory and verify the following lines so the hardware is generated
-with 1 hardware thread and 2 compute units per thread
+with 1 hardware thread and 2 compute units per thread. That is the base configuration and the highest performance configuration
+that fits in the RFSOC 2x2 board consist of 4 hardware threads for FEA and ADJ and 8 compute units per thread. 
 
 #define FEA_THREADS 1
 
