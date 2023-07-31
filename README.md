@@ -2,7 +2,7 @@ GFADES sources and data
 
 Steps to run full implementation with a base design with one thread and 2 compute units done with Linux Ubuntu.
 
-Copy the contents of this repository under a directory named workspace.
+Clone the contents of this repository under a directory named workspace.
 
 Setup path to the Vitis FPGA tools, for example:
 
