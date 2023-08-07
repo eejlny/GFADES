@@ -24,6 +24,19 @@ that fits in the RFSOC 2x2 board consist of 4 hardware threads for FEA and ADJ a
 
 #define C_WIDTH_BLOCK 2
 
+The compute unit always uses sblocks, sblocks groups multiple adj sparse rows into one for processing and it is useful with very sparse matrix to improve performance.
+The USE_SBLOCKS controls if the write unit also uses sblocks and reads multiple FIFO channels comming from the compute unit 
+or reads only one FIFO channel per core and this is generally better because it optimizes the loop that writes data to memory.
+
+#define USE_SBLOCKS 0
+
+IF use_tail is set to 0 then the tail has to be zero so the division bewtween the number of weight columns (number of hidden units or neurons) and the number of compute units needs to be integer
+so  P_w (width of weight matrix) has to be 16, 34, 64 etc but NOT 21. If weight columns is not multiple of 2 then use USE_TAIL 1.
+
+#define USE_TAIL 0
+
+recommended that USE_SBLOCKS is 0 and USE_TAIL 0 for performance
+
 now go to hls solution directory
 
 **cd ..../workspace/gnn-rfsoc-mt-all-2022/hls/gnn/solution1**
