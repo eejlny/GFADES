@@ -4,7 +4,7 @@
 * for the WASP project
 * Author : Jose Nunez-Yanez
 *
-===============================================================================
+==============================================================================
 */
 
 #include <stdio.h>
@@ -745,14 +745,17 @@ void writec(int first_row, int row_count,int P, hls::stream<ITYPE> write_fifo[C_
 		////std::cout << " WL " << WL << " B_WIDTH_INT " << B_WIDTH_INT << std::endl;
 		//LOOP_WRITE1:    for (int i = 0; i < WL; i++) {
 
-		#ifdef USE_SBLOCKS
+		#if (USE_SBLOCKS == 1)
 		  LOOP_WRITE1:    for (int i = 0; i < WL; i+=SPMM_BLOCK) {
 			DTYPE C_out;
 	  		LOOP_WRITE3: for (int z = 0; z <  SPMM_BLOCK; z++) {
  				if ((z+i) < WL)
 				{
-	  			//LOOP_WRITE2: for (int j = 0; j <  B_WIDTH_INT; j++) {
-			    LOOP_WRITE2: for (int j = 0; j <  B_WIDTH_BLOCK; j++) {
+                #if (USE_TAIL == 1)
+ 					LOOP_WRITE2: for (int j = 0; j <  B_WIDTH_INT; j++) {
+				#else
+ 					LOOP_WRITE2: for (int j = 0; j <  B_WIDTH_BLOCK; j++) {
+                #endif
 					#pragma HLS PIPELINE
 						C_out =  write_fifo[j][z].read();
 						//C_out =  write_fifo[j][0].read();
@@ -770,11 +773,16 @@ void writec(int first_row, int row_count,int P, hls::stream<ITYPE> write_fifo[C_
 				}
 			}
 		  }
-		#else
+		#endif
+
+        #if (USE_SBLOCKS == 0)
 		LOOP_WRITE4:    for (int i = 0; i < WL; i++) {
 			DTYPE C_out;
-			    //LOOP_WRITE5: for (int j = 0; j <  B_WIDTH_INT; j++) {
-			     LOOP_WRITE5: for (int j = 0; j <  B_WIDTH_BLOCK; j++) {
+				 #if (USE_TAIL == 1)
+			            LOOP_WRITE5: for (int j = 0; j <  B_WIDTH_INT; j++) { //this reduces performance
+                 #else
+			        	LOOP_WRITE5: for (int j = 0; j <  B_WIDTH_BLOCK; j++) {
+                 #endif
 					#pragma HLS PIPELINE
 						C_out =  write_fifo[j][0].read();
 						C[i*P+j+B_index*B_WIDTH_BLOCK] = C_out;
@@ -2509,9 +2517,10 @@ hls::stream<ITYPE> C_fifo[B_WIDTH_BLOCK][SPMM_BLOCK],int B_index, int B_index_lo
 						LOOP_C_BUF2 : for (int i = 0; i < SPMM_BLOCK; i++) {
 							#pragma HLS UNROLL
 							if (i<crows)
-								#ifdef USE_SBLOCKS
+								#if (USE_SBLOCKS == 1)
 									C_fifo[j][i].write(acc2[j][i]);
-								#else
+								#endif
+								#if (USE_SBLOCKS == 0)
 									C_fifo[j][0].write(acc2[j][i]);
 								#endif
 					}
@@ -3403,7 +3412,7 @@ void loop_adj(int *rowPtr_adj1,int *rowPtr_adj2,int *rowPtr_adj3,int *rowPtr_adj
 
 		 	          ////std::cout << "write matrix size " << N_adj << "," << P_w << //std::endl;
 
-		 	    //std::cout << "WRITEC " << std::endl;
+		 	    std::cout << "WRITEC " << std::endl;
 
 		 	          writec(first_row1,row_count1,P_w, D_fifo1, D1,B_index,B_index_loop, tail);
 

@@ -171,8 +171,15 @@
 
 /*the compute unit always uses sblocks, the USE_SBLOCKS controls if the write unit also uses sblocks and reads multiple FIFO channels
  * or reads only one FIFO channel per core and this is generally better because it optimizes the loop
- * that writes data to memory
+ * that writes data to memory.
  */
+
+#define USE_TAIL 0
+
+/*IF use_tail is set to 0 then the tail has to be zero so the division bewtween the number of weight columns (number of hidden units or neurons) and the number of compute units needs to be integer
+* so  P_w has to be 16, 34, 64 etc but NOT 21. If weight columns is not multiple of 2 then use USE_TAIL 1*/
+
+/*recommended that USE_SBLOCKS is 0 and USE_TAIL 0*/
 
 /* spmm block controls how many rows of the sparse matrix are processed in a single for loop. In principle only one
  * row is processed and then a matrix mult output is written into the C buffer memory. If only a few elements in the row
@@ -212,6 +219,7 @@
 //typedef unsigned long u32;
 
 typedef std::vector<int> vi;
+
 
 
 //int mmult_accel(ap_uint<2> ternary, ap_int<8> zero_point_lhs,  ap_int<8> zero_point_rhs, int M, DTYPE A[A_HEIGHT_BLOCK][A_WIDTH], DTYPE B[B_HEIGHT][B_WIDTH_BLOCK], DTYPE_OUT C[C_HEIGHT_BLOCK][B_WIDTH_BLOCK]);
