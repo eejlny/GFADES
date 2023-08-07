@@ -742,7 +742,7 @@ void writec(int first_row, int row_count,int P, hls::stream<ITYPE> write_fifo[C_
 			B_WIDTH_INT = tail;
 
 
-		////std::cout << " WL " << WL << " B_WIDTH_INT " << B_WIDTH_INT << std::endl;
+		//std::cout << " WL " << WL << " B_WIDTH_INT " << B_WIDTH_INT << std::endl;
 		//LOOP_WRITE1:    for (int i = 0; i < WL; i++) {
 
 		#if (USE_SBLOCKS == 1)
@@ -2307,7 +2307,12 @@ hls::stream<ITYPE> C_fifo[B_WIDTH_BLOCK][SPMM_BLOCK],int B_index, int B_index_lo
 						LOOP_C_BUF2 : for (int i = 0; i < SPMM_BLOCK; i++) {
 							#pragma HLS UNROLL
 							if (i<crows)
-								C_fifo[j][i].write(acc2[j][i]);
+								#if (USE_SBLOCKS == 1)
+									C_fifo[j][i].write(acc2[j][i]);
+								#endif
+								#if (USE_SBLOCKS == 0)
+									C_fifo[j][0].write(acc2[j][i]);
+								#endif
 						}
 						////std::cout << "C_fifo " << acc2[j] << std::endl;
 
@@ -2408,7 +2413,12 @@ hls::stream<ITYPE> C_fifo[B_WIDTH_BLOCK][SPMM_BLOCK],int B_index, int B_index_lo
 						LOOP_C_BUF2 : for (int i = 0; i < SPMM_BLOCK; i++) {
 							#pragma HLS UNROLL
 							if (i<crows)
+							#if (USE_SBLOCKS == 1)
 								C_fifo[j][i].write(acc2[j][i]);
+							#endif
+							#if (USE_SBLOCKS == 0)
+								C_fifo[j][0].write(acc2[j][i]);
+							#endif
 						}
 						////std::cout << "C_fifo " << acc2[j] << std::endl;
 
@@ -3412,7 +3422,7 @@ void loop_adj(int *rowPtr_adj1,int *rowPtr_adj2,int *rowPtr_adj3,int *rowPtr_adj
 
 		 	          ////std::cout << "write matrix size " << N_adj << "," << P_w << //std::endl;
 
-		 	    std::cout << "WRITEC " << std::endl;
+		 	    //std::cout << "WRITEC " << std::endl;
 
 		 	          writec(first_row1,row_count1,P_w, D_fifo1, D1,B_index,B_index_loop, tail);
 
@@ -3536,6 +3546,8 @@ void loop_adj(int *rowPtr_adj1,int *rowPtr_adj2,int *rowPtr_adj3,int *rowPtr_adj
 	    writec(first_row2,row_count2,P_w, D_fifo2, D2,B_index,B_index_loop, tail);
 	    writec(first_row3,row_count3,P_w, D_fifo3, D3,B_index,B_index_loop, tail);
 	    writec(first_row4,row_count4,P_w, D_fifo4, D4,B_index,B_index_loop, tail);
+
+
 
 		#endif
 
