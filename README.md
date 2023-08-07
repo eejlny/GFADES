@@ -89,3 +89,6 @@ VITIS HLS: ..../workspace/gnn-rfsoc-mt-all-2022/hls/gnn
 
 VIVADO: ..../workspace/<project_name/
 
+The jupyter directory contains jupyter notebooks that can be used to test the design in the PYNQ FPGA board
+and measure performance.  
+
