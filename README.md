@@ -90,5 +90,21 @@ VITIS HLS: ..../workspace/gnn-rfsoc-mt-all-2022/hls/gnn
 VIVADO: ..../workspace/<project_name/
 
 The jupyter directory contains jupyter notebooks that can be used to test the design in the PYNQ FPGA board
-and measure performance.  
+and measure performance.  The jupyter notebook sets all the control registers for the pynq buffers. In addition it sets
+
+my_ip.register_map.relu=0  //set to 1 to perform relu in hardware directly
+
+my_ip.register_map.gemm_mode=0 //set to 1 to compute with a dense feature matrix instead of a sparse feature matrix. 
+
+In sparse mode a CSR matrix contains values, column_index and row_pointer for adjacency and feature matrices.
+
+In the dense case the adjacency matrix is still sparse but the feature matrix is dense.
+ 
+In this dense case the feature values buffer contains all the values including zeros. 
+In this dense case the row_pointer and column_index buffers are not used since they are generated internally by the hardware
+internally.
+
+The dense case is useful with datasets with dense feature matrices or after the first layer where the amount of sparsity could be low or the overhead
+of obtaining a csr matrix at run-time unfeasible. 
+
 
