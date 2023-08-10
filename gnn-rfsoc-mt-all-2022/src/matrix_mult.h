@@ -174,7 +174,9 @@
  * that writes data to memory.
  */
 
+
 #define USE_TAIL 0
+#define USE_RELU 0
 
 /*IF use_tail is set to 0 then the tail has to be zero so the division bewtween the number of weight columns (number of hidden units or neurons) and the number of compute units needs to be integer
 * so  P_w has to be 16, 34, 64 etc but NOT 21. If weight columns is not multiple of 2 then use USE_TAIL 1*/

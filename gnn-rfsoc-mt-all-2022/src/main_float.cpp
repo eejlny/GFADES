@@ -20,15 +20,18 @@
 #define max_M_fea MAX_M
 #define max_P_w MAX_P
 
+#define use_gemm 0
+
 float max_adj=0.0;
 float min_adj=0.0;
 float max_fea=0.0;
 float min_fea=0.0;
 
+
 //#define generate_data
 
 // for citeseer dataset
-//#define citeseeruse
+//#define citeseer
 //#define molecule
 #define citeseer_mod
 //#define cora
@@ -40,9 +43,13 @@ int M_fea = 7;  // number of input features
 int P_w = 32;  // number of features in the hidden layer
 int NNZ_adj = 5028;  // number of non-zero values of adjacency
 int NNZ_fea = 2273;  // number of non-zero values of feature
-static const std::string adj_name = "../../../data/matrices/mol_adj.txt";
-static const std::string fea_name = "../../../data/matrices/mol_feat.txt";
-static const std::string w_name = "../../../data/matrices/mol_weights.txt";
+static const std::string adj_name = "C:/Users/josnu02/workspace/gnn-z2/data/matrices/mol_adj.txt";
+#if (use_gemm == 0)
+	static const std::string fea_name = "C:/Users/josnu02/workspace/gnn-z2/data/matrices/mol_feat.txt";
+#else
+	static const std::string fea_name = "C:/Users/josnu02/workspace/gnn-z2/data/matrices/mol_feat_dense.txt";
+#endif
+static const std::string w_name = "C:/Users/josnu02/workspace/gnn-z2/data/matrices/mol_weights.txt";
 #endif
 
 #ifdef citeseer_mod
@@ -62,9 +69,9 @@ int M_fea = 500;  // number of input features
 int P_w = 18;  // number of features in the hidden layer
 int NNZ_adj = 108365;  // number of non-zero values of adjacency
 int NNZ_fea = 988031;  // number of non-zero values of feature
-static const std::string adj_name = "../../../data/matrices/cora_adj.txt";
-static const std::string fea_name = "../../../data/matrices/cora_feat.txt";
-static const std::string w_name = "../../../data/matrices/cora_weights.txt";
+static const std::string adj_name = "C:/Users/josnu02/workspace/gnn-z2/data/matrices/cora_adj.txt";
+static const std::string fea_name = "C:/Users/josnu02/workspace/gnn-z2/data/matrices/cora_feat.txt";
+static const std::string w_name = "C:/Users/josnu02/workspace/gnn-z2/data/matrices/cora_weights.txt";
 #endif
 
 #ifdef cora
@@ -73,9 +80,9 @@ int M_fea = 1433;  // number of input features
 int P_w = 64;  // number of features in the hidden layer
 int NNZ_adj = 13264;  // number of non-zero values of adjacency
 int NNZ_fea = 49216;  // number of non-zero values of feature
-static const std::string adj_name = "../../../data/matrices/cora_adj.txt";
-static const std::string fea_name = "../../../data/matrices/cora_feat.txt";
-static const std::string w_name = "../../../data/matrices/cora_weights.txt";
+static const std::string adj_name = "C:/Users/josnu02/workspace/gnn-z2/data/matrices/cora_adj.txt";
+static const std::string fea_name = "C:/Users/josnu02/workspace/gnn-z2/data/matrices/cora_feat.txt";
+static const std::string w_name = "C:/Users/josnu02/workspace/gnn-z2/data/matrices/cora_weights.txt";
 #endif
 
 #ifdef citeseer
@@ -268,6 +275,8 @@ static void load_fea(int N,int M,FTYPE *A,std::string file_name)
 	int val_zero=0;
 	FTYPE array_val;
 
+	std::cout << "Reading dense FEA "<< std::endl;
+
     for (int i = 0; i < N; i++) {
     	// Read data, line by line
     	std::getline(myFile, line);
@@ -295,7 +304,7 @@ static void load_fea(int N,int M,FTYPE *A,std::string file_name)
 	        //std::cout << i <<" "<< j << " " << array_val << std::endl;
 	        A[i * M + j] = array_val;
 	        val_count++;
-	        //std::cout << i <<" "<< j << " " << array_val << " " << A[i * N + j] << std::endl;
+            //std::cout << i <<" "<< j << " " << A[i * M + j] << std::endl;
 
 	    }
     }
@@ -824,8 +833,10 @@ int N_adj,int M_adj,int M_fea,int P_w,std::string adj_file,std::string fea_file,
         //init_weights(w_m, D_sw, D);
 
 	#else
-
-        loadcsr_fea(fea_name,N_adj,M_fea,values_fea,colIndices_fea,rowPtr_fea,NNZ_fea);
+        if (gemm_mode == 0)
+        	loadcsr_fea(fea_name,N_adj,M_fea,values_fea,colIndices_fea,rowPtr_fea,NNZ_fea);
+        else
+        	load_fea(N_adj,M_fea,values_fea,fea_name);
         loadcsr_adj(adj_name,N_adj,N_adj,values_adj,colIndices_adj,rowPtr_adj,NNZ_adj);
         load_weights(M_fea,P_w,w_m,w_name);
 
@@ -996,8 +1007,8 @@ int main(int argc, char* argv[]){
      }
 
      bias_count = 0;
-     bool gemm_mode = 0;
 
+     bool gemm_mode = use_gemm;
 
      test_passed = gnn_test(gemm_mode,quantized_multiplier,shift,bias,bias_count,profiling,zero_point_lhs,zero_point_rhs,zero_point_dst,clamp_max,
                   clamp_min,w_m,D_sw,D,D,D,D,values_fea,colIndices_fea,rowPtr_fea,nnz_fea,values_adj,colIndices_adj,rowPtr_adj,nnz_adj,adj_m, fea_m,

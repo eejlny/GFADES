@@ -710,7 +710,7 @@ void dsp_kernel_int_fea(FTYPE a_value,BTYPE b_block[B_HEIGHT/4][B_WIDTH_BLOCK],a
 
 
 
-void writec(int first_row, int row_count,int P, hls::stream<ITYPE> write_fifo[C_WIDTH_BLOCK][SPMM_BLOCK], DTYPE* C,int B_index,int B_index_loop,int tail)
+void writec(bool relu,int first_row, int row_count,int P, hls::stream<ITYPE> write_fifo[C_WIDTH_BLOCK][SPMM_BLOCK], DTYPE* C,int B_index,int B_index_loop,int tail)
 {
 		int B_WIDTH_INT;
 
@@ -764,7 +764,14 @@ void writec(int first_row, int row_count,int P, hls::stream<ITYPE> write_fifo[C_
 						#ifdef ENABLE_TRANSPOSE
 							//C[i+(j+B_index*B_WIDTH_BLOCK)*(array_c_adjust)] = C_out;
 						#else
-							C[(i+z)*P+j+B_index*B_WIDTH_BLOCK] = C_out;
+							#if (USE_RELU == 1)
+						    	if (C_out > 0 || relu == 0)
+						    		C[(i+z)*P+j+B_index*B_WIDTH_BLOCK] = C_out;
+						    	else
+						    		C[(i+z)*P+j+B_index*B_WIDTH_BLOCK] = 0.0;
+							#else
+					    		 C[(i+z)*P+j+B_index*B_WIDTH_BLOCK] = C_out;
+                            #endif
 							//C[i*P+j+B_index*B_WIDTH_BLOCK] = C_out;
 							//C[i*B_WIDTH_INT+j] = C_out;
 							//C[j] = C_out;
@@ -784,8 +791,15 @@ void writec(int first_row, int row_count,int P, hls::stream<ITYPE> write_fifo[C_
 			        	LOOP_WRITE5: for (int j = 0; j <  B_WIDTH_BLOCK; j++) {
                  #endif
 					#pragma HLS PIPELINE
-						C_out =  write_fifo[j][0].read();
-						C[i*P+j+B_index*B_WIDTH_BLOCK] = C_out;
+			        	C_out =  write_fifo[j][0].read();
+						#if (USE_RELU == 1)
+			        		if (C_out > 0 || relu == 0)
+								C[i*P+j+B_index*B_WIDTH_BLOCK] = C_out;
+			        		else
+			        			C[i*P+j+B_index*B_WIDTH_BLOCK] = 0.0;
+						#else
+			        		C[i*P+j+B_index*B_WIDTH_BLOCK] = C_out;
+						#endif
 					}
 		}
 		#endif
@@ -951,6 +965,11 @@ void readval_fea(bool gemm_mode,int ccount,int last_index,hls::stream<FTYPE> &A_
 			//std::cout << "A_fifo " << values[j] << std::endl;
 			col_indices_fifo << columnIndex[j];
 		    //std::cout << "col index fea " << columnIndex[j] << std::endl;
+
+			//std::cout << "A_fifo " << values[j] << std::endl;
+			//std::cout << "col index fea " << columnIndex[j] << std::endl;
+
+
 		}
 	}
 	else
@@ -970,13 +989,18 @@ void readval_fea(bool gemm_mode,int ccount,int last_index,hls::stream<FTYPE> &A_
 
 				A_fifo <<  values[j];
 				col_indices_fifo << c;
-				if (c == ccount) //column count
+
+				//std::cout << "A_fifo " << values[j] << std::endl;
+				//std::cout << "col index fea " << c << std::endl;
+
+				if (c == (ccount-1)) //column count
 					c=0;
 				else
 					c++;
-				////std::cout << "A_fifo " << values[j] << std::endl;
-				////std::cout << "col index fea " << columnIndex[j] << std::endl;
+
+
 			}
+
 	}
 }
 
@@ -1294,7 +1318,7 @@ int B_index_loop, int tail,int *rowPtr_fea,int *columnIndex_fea,FTYPE *values_fe
 
 
 
-    //std::cout << "last index fea " << last_index_fea << std::endl;
+    std::cout << "last index fea " << last_index_fea << std::endl;
 
     //std::cout << "first_row " << first_row << "row_count " << row_count << std::endl;
 
@@ -3268,7 +3292,7 @@ void loop_fea(bool gemm_mode,int *rowPtr_fea1,int *rowPtr_fea2,int *rowPtr_fea3,
 }
 
 
-void loop_adj(int *rowPtr_adj1,int *rowPtr_adj2,int *rowPtr_adj3,int *rowPtr_adj4,
+void loop_adj(bool relu,int *rowPtr_adj1,int *rowPtr_adj2,int *rowPtr_adj3,int *rowPtr_adj4,
 	int *columnIndex_adj1,int *columnIndex_adj2,int *columnIndex_adj3,int *columnIndex_adj4,
 	FTYPE *values_adj1,FTYPE *values_adj2,FTYPE *values_adj3,FTYPE *values_adj4,
 	int N_adj, int M_adj,int P_w, ap_int<8> zero_point_lhs,  ap_int<8> zero_point_rhs,
@@ -3424,7 +3448,7 @@ void loop_adj(int *rowPtr_adj1,int *rowPtr_adj2,int *rowPtr_adj3,int *rowPtr_adj
 
 		 	    //std::cout << "WRITEC " << std::endl;
 
-		 	          writec(first_row1,row_count1,P_w, D_fifo1, D1,B_index,B_index_loop, tail);
+		 	          writec(relu,first_row1,row_count1,P_w, D_fifo1, D1,B_index,B_index_loop, tail);
 
 	#endif
 
@@ -3485,8 +3509,8 @@ void loop_adj(int *rowPtr_adj1,int *rowPtr_adj2,int *rowPtr_adj3,int *rowPtr_adj
 
 		#endif
 
-	   	 writec(first_row1,row_count1,P_w, D_fifo1, D1,B_index,B_index_loop, tail);
-	   	 writec(first_row2,row_count2,P_w, D_fifo2, D2,B_index,B_index_loop, tail);
+	   	 writec(relu,first_row1,row_count1,P_w, D_fifo1, D1,B_index,B_index_loop, tail);
+	   	 writec(relu,first_row2,row_count2,P_w, D_fifo2, D2,B_index,B_index_loop, tail);
 
 		#endif
 
@@ -3542,10 +3566,10 @@ void loop_adj(int *rowPtr_adj1,int *rowPtr_adj2,int *rowPtr_adj3,int *rowPtr_adj
         compute2_4(N_adj_block,zero_point_lhs,  zero_point_rhs, first_row3,row_count3,A_fifo_adj3, col_indices_fifo_adj3, rnnz_fifo_adj3,C_adj13,C_adj23,C_adj33,C_adj43,D_fifo3, B_index, B_index_loop, tail);
         compute2_4(N_adj_block,zero_point_lhs,  zero_point_rhs, first_row4,row_count4,A_fifo_adj4, col_indices_fifo_adj4, rnnz_fifo_adj4,C_adj14,C_adj24,C_adj34,C_adj44,D_fifo4, B_index, B_index_loop, tail);
 
-	    writec(first_row1,row_count1,P_w, D_fifo1, D1,B_index,B_index_loop, tail);
-	    writec(first_row2,row_count2,P_w, D_fifo2, D2,B_index,B_index_loop, tail);
-	    writec(first_row3,row_count3,P_w, D_fifo3, D3,B_index,B_index_loop, tail);
-	    writec(first_row4,row_count4,P_w, D_fifo4, D4,B_index,B_index_loop, tail);
+	    writec(relu,first_row1,row_count1,P_w, D_fifo1, D1,B_index,B_index_loop, tail);
+	    writec(relu,first_row2,row_count2,P_w, D_fifo2, D2,B_index,B_index_loop, tail);
+	    writec(relu,first_row3,row_count3,P_w, D_fifo3, D3,B_index,B_index_loop, tail);
+	    writec(relu,first_row4,row_count4,P_w, D_fifo4, D4,B_index,B_index_loop, tail);
 
 
 
@@ -3558,7 +3582,7 @@ void loop_adj(int *rowPtr_adj1,int *rowPtr_adj2,int *rowPtr_adj3,int *rowPtr_adj
 
 }
 
-void mmult_wrapper(bool gemm_mode,ap_int<32> *quantized_multiplier, ap_int<32> *shift, ap_int<32> *bias,
+void mmult_wrapper(bool gemm_mode,bool relu,ap_int<32> *quantized_multiplier, ap_int<32> *shift, ap_int<32> *bias,
 	ap_int<32> bias_count, ap_int<8> zero_point_lhs,  ap_int<8> zero_point_rhs,
 	ap_int<8> zero_point_dst, ap_int<8> clamp_max,ap_int<8> clamp_min,int N_adj, int M_adj, int M_fea,
 	int P_w, BTYPE* B,
@@ -3670,7 +3694,7 @@ void mmult_wrapper(bool gemm_mode,ap_int<32> *quantized_multiplier, ap_int<32> *
       C_buffer41,C_buffer42,C_buffer43,C_buffer44,
       B_index_loop,tail);
 
-	  loop_adj(rowPtr_adj1,rowPtr_adj2,rowPtr_adj3,rowPtr_adj4,
+	  loop_adj(relu,rowPtr_adj1,rowPtr_adj2,rowPtr_adj3,rowPtr_adj4,
 	  columnIndex_adj1,columnIndex_adj2,columnIndex_adj3,columnIndex_adj4,
 	  values_adj1,values_adj2,values_adj3,values_adj4,
 	  N_adj, M_adj,P_w,zero_point_lhs,zero_point_rhs,
@@ -3691,7 +3715,7 @@ typedef unsigned long u32;
 */
 
 
-void mmult_top(bool gemm_mode,ap_int<32> *quantized_multiplier, ap_int<32> *shift, ap_int<32> *bias,
+void mmult_top(bool gemm_mode,bool relu, ap_int<32> *quantized_multiplier, ap_int<32> *shift, ap_int<32> *bias,
 ap_int<32> bias_count,ap_int<64> *profiling, ap_int<8> zero_point_lhs,  ap_int<8> zero_point_rhs,
 ap_int<8> zero_point_dst,
 ap_int<8> clamp_max,ap_int<8> clamp_min,int N_adj, int M_adj, int M_fea, int P_w,
@@ -3719,6 +3743,7 @@ ATYPE *values_adj1,ATYPE *values_adj2,ATYPE *values_adj3,ATYPE *values_adj4)
      #pragma HLS INTERFACE s_axilite port = P_w bundle = control
 	 #pragma HLS INTERFACE s_axilite port = array_c_adjust bundle = control
      #pragma HLS INTERFACE s_axilite port = gemm_mode bundle = control
+     #pragma HLS INTERFACE s_axilite port = relu bundle = control
 
      #pragma HLS INTERFACE m_axi port = profiling depth=16 offset=slave bundle = profiling
      #pragma HLS INTERFACE m_axi port=rowPtr_fea1 depth=4096 offset=slave bundle = rowPtr_fea1
@@ -3857,7 +3882,7 @@ ATYPE *values_adj1,ATYPE *values_adj2,ATYPE *values_adj3,ATYPE *values_adj4)
          //for (int B_index = 0; B_index < B_index_loop; B_index++) {
 
 
-	  mmult_wrapper(gemm_mode,quantized_multiplier_data, shift_data, bias_data, bias_count, zero_point_lhs, zero_point_rhs, zero_point_dst, clamp_max,clamp_min,N_adj, M_adj, M_fea, P_w,
+	  mmult_wrapper(gemm_mode,relu,quantized_multiplier_data, shift_data, bias_data, bias_count, zero_point_lhs, zero_point_rhs, zero_point_dst, clamp_max,clamp_min,N_adj, M_adj, M_fea, P_w,
 	  B,D1, D2, D3,D4,
       array_c_adjust, B_index_loop, tail,
 	  rowPtr_fea1,rowPtr_fea2,rowPtr_fea3,rowPtr_fea4,
@@ -3952,7 +3977,8 @@ int P_w
 
     printf(" sw starting ");
 
-    mmult_top(gemm_mode,quantized_multiplier,shift,bias,bias_count,profiling,zero_point_lhs,zero_point_rhs, zero_point_dst,clamp_max,clamp_min,
+    bool relu = 0;
+    mmult_top(gemm_mode,relu,quantized_multiplier,shift,bias,bias_count,profiling,zero_point_lhs,zero_point_rhs, zero_point_dst,clamp_max,clamp_min,
     N_adj, M_adj, M_fea, P_w,
     array_b,
     array_d1,array_d2,array_d3,array_d4,
