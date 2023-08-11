@@ -1,1 +1,1 @@
-all jupyter demo files
+all jupyter demo files for pygat
