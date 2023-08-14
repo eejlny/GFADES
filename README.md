@@ -107,7 +107,7 @@ internally.
 The dense case is useful with datasets with dense feature matrices or after the first layer where the amount of sparsity could be low or the overhead
 of obtaining a csr matrix at run-time unfeasible. 
 
-The Jupyter directory also contains a full GCN network that uses the accelerator during training. It requires torch_geometric==2.0.1 installed on the board.
+The Jupyter directory also contains a full GCN network for molecule graph classification that uses the accelerator during training. It requires torch_geometric==2.0.1 installed on the board.
 The notebook currently offloads the forward passes to the FPGA for both layers and contains a custom backward path that uses tensors saved from the hardware. T
 Future work invoves offloading the backward path calculations. The training loops shows as follows:  
 
