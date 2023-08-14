@@ -89,7 +89,7 @@ VITIS HLS: ..../workspace/gnn-rfsoc-mt-all-2022/hls/gnn
 
 VIVADO: ..../workspace/<project_name/
 
-The jupyter directory contains jupyter notebooks that can be used to test the design in the PYNQ FPGA board
+The jupyter directory contains a test jupyter notebook that can be used to test the design in the PYNQ FPGA board
 and measure performance.  The jupyter notebook sets all the control registers for the pynq buffers. In addition it sets
 
 my_ip.register_map.relu=0  //set to 1 to perform relu in hardware directly
@@ -106,5 +106,42 @@ internally.
 
 The dense case is useful with datasets with dense feature matrices or after the first layer where the amount of sparsity could be low or the overhead
 of obtaining a csr matrix at run-time unfeasible. 
+
+The Jupyter directory also contains a full GCN network that uses the accelerator during training. It requires torch_geometric==2.0.1 installed on the board.
+The notebook currently offloads the forward passes to the FPGA for both layers and contains a custom backward path that uses tensors saved from the hardware. T
+Future work invoves offloading the backward path calculations. The training loops shows as follows:  
+
+
+Epoch: 006, Train Acc: 0.6649, Test Acc: 0.6200
+
+Running train
+
+Running test
+
+Epoch: 007, Train Acc: 0.6649, Test Acc: 0.6200
+
+Running train
+
+Running test
+
+Epoch: 008, Train Acc: 0.6755, Test Acc: 0.6200
+
+Running train
+
+Running test
+
+Epoch: 009, Train Acc: 0.7394, Test Acc: 0.7600
+
+Running train
+
+Running test
+
+Epoch: 010, Train Acc: 0.7074, Test Acc: 0.7400
+
+Running train
+
+Running test
+
+Epoch: 011, Train Acc: 0.7234, Test Acc: 0.7600  
 
 
