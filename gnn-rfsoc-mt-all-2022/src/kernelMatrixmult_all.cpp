@@ -812,10 +812,10 @@ void readptr_fea(bool gemm_mode,int N,int M,int *rowPtr,hls::stream<int> rnnz_fi
     #pragma HLS inline off
 	int rnnz,current_index,next_index;
 
-	current_index= rowPtr[0];
 
 	if (gemm_mode==0)
 	{
+		current_index= rowPtr[0];
 		//printf("N rows are %d\n", N);
 		LOOP_A_INDEX_SPMM1 : for (int A_index = 0; A_index < N; A_index+=SPMM_BLOCK) {
 			int brnnz = 0;
@@ -962,8 +962,12 @@ void readval_fea(bool gemm_mode,int ccount,int last_index,hls::stream<FTYPE> &A_
 				//fifo_empty_1++;
 
 			A_fifo <<  values[j];
-			//std::cout << "A_fifo " << values[j] << std::endl;
+
 			col_indices_fifo << columnIndex[j];
+
+			//std::cout << "A_fifo " << values[j] << std::endl;
+			//std::cout << "col index fea " << columnIndex[j] << std::endl;
+
 		    //std::cout << "col index fea " << columnIndex[j] << std::endl;
 
 			//std::cout << "A_fifo " << values[j] << std::endl;
@@ -1297,6 +1301,7 @@ int B_index_loop, int tail,int *rowPtr_fea,int *columnIndex_fea,FTYPE *values_fe
 
 
 	int last_index_fea;
+
 	//int last_index_adj;
 
 	//last_index_adj=rowPtr_adj[N_adj];
@@ -1304,21 +1309,21 @@ int B_index_loop, int tail,int *rowPtr_fea,int *columnIndex_fea,FTYPE *values_fe
 	{
 		last_index_fea=rowPtr_fea[first_row+row_count]-rowPtr_fea[first_row];
 		//std::cout << "Thread fea is processing non-zeros " << last_index_fea << "from address " << values_fea << std::endl;
-	    columnIndex_fea += rowPtr_fea[first_row];
-	    values_fea += rowPtr_fea[first_row];
+		columnIndex_fea += rowPtr_fea[first_row];
+		values_fea += rowPtr_fea[first_row];
         //std::cout << "rowPtr_fea[first_row] " << rowPtr_fea[first_row] << std::endl;
 	    rowPtr_fea += first_row;
 	}
 	else
 	{
 		last_index_fea=row_count*M;
-		values_fea+=first_row;
+		values_fea+=first_row*M;
 	}
 
 
 
 
-    std::cout << "last index fea " << last_index_fea << std::endl;
+    //std::cout << "last index fea " << last_index_fea << std::endl;
 
     //std::cout << "first_row " << first_row << "row_count " << row_count << std::endl;
 
@@ -2005,6 +2010,8 @@ void dsp_kernel_wrapper_fea(bool gemm_mode,int M[SPMM_BLOCK],hls::stream<FTYPE> 
 					if ((k+i) < BM) //avoid trying to read empty FIFO that only contains BM elements
 					{
 						v = A_fifo.read();
+
+						//printf("A fifo read %f \n", v);
 						//if (gemm_mode==0)
 							ci = col_indices_fifo.read();
 						//else
@@ -3238,16 +3245,21 @@ void loop_fea(bool gemm_mode,int *rowPtr_fea1,int *rowPtr_fea2,int *rowPtr_fea3,
 		      first_row3 = 2*N_fea_block;
 		      first_row4 = 3*N_fea_block;
 
-			    //std::cout << "READA1 " << std::endl;
+
+		      //std::cout << "thread1" << std::endl;
 
 	          reada1(gemm_mode,M_fea,first_row1,row_count1,A_fifo_fea1,col_indices_fifo_fea1,rnnz_fifo_fea1,B_index_loop,tail,
 		        rowPtr_fea1,columnIndex_fea1,values_fea1);
+	          //std::cout << "thread2" << std::endl;
 	          reada1(gemm_mode,M_fea,first_row2,row_count2,A_fifo_fea2,col_indices_fifo_fea2,rnnz_fifo_fea2,B_index_loop,tail,
 	            rowPtr_fea2,columnIndex_fea2,values_fea2);
+	          //std::cout << "thread3" << std::endl;
 	          reada1(gemm_mode,M_fea,first_row3,row_count3,A_fifo_fea3,col_indices_fifo_fea3,rnnz_fifo_fea3,B_index_loop,tail,
 	            rowPtr_fea3,columnIndex_fea3,values_fea3);
+	          //std::cout << "thread4" << std::endl;
 	          reada1(gemm_mode,M_fea,first_row4,row_count4,A_fifo_fea4,col_indices_fifo_fea4,rnnz_fifo_fea4,B_index_loop,tail,
 	            rowPtr_fea4,columnIndex_fea4,values_fea4);
+
 
 		  //check_fifo_0(a_values, A_fifo, A_fifo_out);
 
@@ -3881,6 +3893,11 @@ ATYPE *values_adj1,ATYPE *values_adj2,ATYPE *values_adj3,ATYPE *values_adj4)
 
          //for (int B_index = 0; B_index < B_index_loop; B_index++) {
 
+	  int N_adj_block = N_adj/ADJ_THREADS;
+	  D2+=N_adj_block*P_w;
+	  D3+=2*N_adj_block*P_w;
+	  D4+=3*N_adj_block*P_w;
+
 
 	  mmult_wrapper(gemm_mode,relu,quantized_multiplier_data, shift_data, bias_data, bias_count, zero_point_lhs, zero_point_rhs, zero_point_dst, clamp_max,clamp_min,N_adj, M_adj, M_fea, P_w,
 	  B,D1, D2, D3,D4,
@@ -3967,10 +3984,10 @@ int P_w
 
     int array_c_adjust=N_adj;
 
-    int N_adj_block = N_adj/ADJ_THREADS;
-    array_d2+=N_adj_block*P_w;
-    array_d3+=2*N_adj_block*P_w;
-    array_d4+=3*N_adj_block*P_w;
+    //int N_adj_block = N_adj/ADJ_THREADS;
+    //array_d2+=N_adj_block*P_w;
+    //array_d3+=2*N_adj_block*P_w;
+    //array_d4+=3*N_adj_block*P_w;
 
     //#pragma SDS resource(1)
     //#pragma SDS async(1)

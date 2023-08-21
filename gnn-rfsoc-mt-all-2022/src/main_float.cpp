@@ -20,7 +20,7 @@
 #define max_M_fea MAX_M
 #define max_P_w MAX_P
 
-#define use_gemm 0
+#define use_gemm 1
 
 float max_adj=0.0;
 float min_adj=0.0;
@@ -32,8 +32,8 @@ float min_fea=0.0;
 
 // for citeseer dataset
 //#define citeseer
-//#define molecule
-#define citeseer_mod
+#define molecule
+//#define citeseer_mod
 //#define cora
 //#define test
 
@@ -55,7 +55,7 @@ static const std::string w_name = "C:/Users/josnu02/workspace/gnn-z2/data/matric
 #ifdef citeseer_mod
 int N_adj = 3327;  // number of nodes
 int M_fea = 3703;  // number of input features
-int P_w = 32;  // number of features in the hidden layer
+int P_w = 16;  // number of features in the hidden layer
 int NNZ_adj = 12431;  // number of non-zero values of adjacency
 int NNZ_fea = 105165;  // number of non-zero values of feature
 static const std::string adj_name = "../../../../../../../data/matrices/citeseer_adj.txt";
@@ -346,7 +346,7 @@ static int result_check(int N,int P, DTYPE *D, DTYPE *D_sw)
      //for (int i = 0; i < P_w; i++) {
          //for (int j = 0; j < N_adj; j++) {
      for (int i = 0; i < 1; i++) {
-        for (int j = 0; j < 21; j++) {
+        for (int j = 0; j < P_w; j++) {
           //if (C_sw[i] != C[i]) {
           //     std::cout << "Mismatch: data index= " << i << " golden = " << C_sw[i]
           //               << ", kernel = " << C[i] << std::endl;
@@ -358,8 +358,34 @@ static int result_check(int N,int P, DTYPE *D, DTYPE *D_sw)
 	        std::cout << "out :data index= " << i << " " << j << " kernel = " << D[i*P_w+j] << std::endl;
          }
      }
-     for (int i = (P_w-1); i < P_w; i++) {
-        for (int j = 0; j < 21; j++) {
+     for (int i = (300); i < 301; i++) {
+        for (int j = 0; j < P_w; j++) {
+          //if (C_sw[i] != C[i]) {
+          //     std::cout << "Mismatch: data index= " << i << " golden = " << C_sw[i]
+          //               << ", kernel = " << C[i] << std::endl;
+          //     return 1;
+          //}
+          //else
+        	//  std::cout << "out :data index= " << i << " golden = " << C_sw[i] << std::endl;
+
+	        std::cout << "out :data index= " << i << " " << j << " kernel = " << D[i*P_w+j] << std::endl;
+         }
+     }
+     for (int i = (831); i < 832; i++) {
+        for (int j = 0; j < P_w; j++) {
+          //if (C_sw[i] != C[i]) {
+          //     std::cout << "Mismatch: data index= " << i << " golden = " << C_sw[i]
+          //               << ", kernel = " << C[i] << std::endl;
+          //     return 1;
+          //}
+          //else
+        	//  std::cout << "out :data index= " << i << " golden = " << C_sw[i] << std::endl;
+
+	        std::cout << "out :data index= " << i << " " << j << " kernel = " << D[i*P_w+j] << std::endl;
+         }
+     }
+     for (int i = (2000); i < 2001; i++) {
+        for (int j = 0; j < P_w; j++) {
           //if (C_sw[i] != C[i]) {
           //     std::cout << "Mismatch: data index= " << i << " golden = " << C_sw[i]
           //               << ", kernel = " << C[i] << std::endl;

@@ -40,9 +40,9 @@
 
 //#define simulation
 
-#define MAX_N    6144 //20480//16384 //4096 //32768 //20480 //64
-#define MAX_M    6144 //20480//16384 //4096 //24576 //2048 //384 //1536 //384 //1536 // 384 //48 //768 //96 //384 //96 //384 //96 //384// 96
-#define MAX_P    128 //2048 //512 //64//1//64//1
+#define MAX_N    6144 //adj dimensions adj matrix NxN //20480//16384 //4096 //32768 //20480 //64
+#define MAX_M    6144 //Number of features fea matrix NxM //20480//16384 //4096 //24576 //2048 //384 //1536 //384 //1536 // 384 //48 //768 //96 //384 //96 //384 //96 //384// 96
+#define MAX_P    128 //Number of hideen units weight matrix MxP 2048 //512 //64//1//64//1
 
 #define MAX_FIFO 8
 
@@ -57,12 +57,12 @@
 // 768 for WL 4
 
 #define A_HEIGHT   MAX_N
-#define A_WIDTH    MAX_M
+#define A_WIDTH    MAX_N
 
-#define B_HEIGHT   MAX_M
-#define B_WIDTH    MAX_P
+#define B_HEIGHT   MAX_N
+#define B_WIDTH    MAX_M
 
-#define C_HEIGHT   MAX_N
+#define C_HEIGHT   MAX_M
 #define C_WIDTH    MAX_P
 
 
@@ -163,8 +163,8 @@
 //	typedef float FTYPE;
 //#endif
 
-#define FEA_THREADS 1
-#define ADJ_THREADS 1
+#define FEA_THREADS 4
+#define ADJ_THREADS 4
 
 #define SPMM_BLOCK 4
 #define USE_SBLOCKS 0
@@ -176,7 +176,7 @@
 
 
 #define USE_TAIL 0
-#define USE_RELU 0
+#define USE_RELU 1
 
 /*IF use_tail is set to 0 then the tail has to be zero so the division bewtween the number of weight columns (number of hidden units or neurons) and the number of compute units needs to be integer
 * so  P_w has to be 16, 34, 64 etc but NOT 21. If weight columns is not multiple of 2 then use USE_TAIL 1*/
@@ -191,8 +191,8 @@
  */
 
 #define A_HEIGHT_BLOCK  1// 4096 //(512/4)
-#define B_WIDTH_BLOCK 2 //the width of compute1 BLOCK BUFFER A*B = C 16 //32 //64 //64 //128 // 64 //64 //64 //8//8// //16//32//1//32//1//32//1// 1//32//(128/4)
-#define C_WIDTH_BLOCK 2 //the width of compute2 BLOCK BUFFER C*D = F
+#define B_WIDTH_BLOCK 8 //the width of compute1 BLOCK BUFFER A*B = C 16 //32 //64 //64 //128 // 64 //64 //64 //8//8// //16//32//1//32//1//32//1// 1//32//(128/4)
+#define C_WIDTH_BLOCK 8 //the width of compute2 BLOCK BUFFER C*D = F
 #define B_BLOCK_PARALLEL 1
 //#define PES_ADJ 2 // Number of PEs for ADJ processing
 //#define PES_FEA 2 // Number iof PEs for FEA processing
