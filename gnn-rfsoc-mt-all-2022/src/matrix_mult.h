@@ -175,7 +175,7 @@
  */
 
 
-#define USE_TAIL 0
+#define USE_TAIL 0 //parameter discontinued. it should always be zero so the block size is always processed but only tail remainer is written to memory.
 #define USE_RELU 1
 
 /*IF use_tail is set to 0 then the tail has to be zero so the division bewtween the number of weight columns (number of hidden units or neurons) and the number of compute units needs to be integer

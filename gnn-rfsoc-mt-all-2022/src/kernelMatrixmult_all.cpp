@@ -765,10 +765,13 @@ void writec(bool relu,int first_row, int row_count,int P, hls::stream<ITYPE> wri
 							//C[i+(j+B_index*B_WIDTH_BLOCK)*(array_c_adjust)] = C_out;
 						#else
 							#if (USE_RELU == 1)
+						    if(j<B_WIDTH_INT)
+			    			{
 						    	if (C_out > 0 || relu == 0)
 						    		C[(i+z)*P+j+B_index*B_WIDTH_BLOCK] = C_out;
 						    	else
 						    		C[(i+z)*P+j+B_index*B_WIDTH_BLOCK] = 0.0;
+						    }
 							#else
 					    		 C[(i+z)*P+j+B_index*B_WIDTH_BLOCK] = C_out;
                             #endif
@@ -793,10 +796,13 @@ void writec(bool relu,int first_row, int row_count,int P, hls::stream<ITYPE> wri
 					#pragma HLS PIPELINE
 			        	C_out =  write_fifo[j][0].read();
 						#if (USE_RELU == 1)
+						if(j<B_WIDTH_INT)
+	    				{
 			        		if (C_out > 0 || relu == 0)
 								C[i*P+j+B_index*B_WIDTH_BLOCK] = C_out;
 			        		else
 			        			C[i*P+j+B_index*B_WIDTH_BLOCK] = 0.0;
+			        	}
 						#else
 			        		C[i*P+j+B_index*B_WIDTH_BLOCK] = C_out;
 						#endif
@@ -2327,7 +2333,9 @@ hls::stream<ITYPE> C_fifo[B_WIDTH_BLOCK][SPMM_BLOCK],int B_index, int B_index_lo
 
 			LOOP_C_BUF1: for (int j = 0; j < B_WIDTH_BLOCK; j++) {
 	                #pragma HLS UNROLL
+					#if (USE_TAIL == 1)
 					if (j < B_WIDTH_INT)
+					#endif
 					{
 						#ifdef simulation
 						if (acc2[j] < acc2_adj_min)
@@ -2433,7 +2441,9 @@ hls::stream<ITYPE> C_fifo[B_WIDTH_BLOCK][SPMM_BLOCK],int B_index, int B_index_lo
 
 			LOOP_C_BUF1: for (int j = 0; j < B_WIDTH_BLOCK; j++) {
 	                #pragma HLS UNROLL
+					#if (USE_TAIL == 1)
 					if (j < B_WIDTH_INT)
+					#endif
 					{
 						#ifdef simulation
 						if (acc2[j] < acc2_adj_min)
@@ -2545,7 +2555,9 @@ hls::stream<ITYPE> C_fifo[B_WIDTH_BLOCK][SPMM_BLOCK],int B_index, int B_index_lo
 
 		LOOP_C_BUF1: for (int j = 0; j < B_WIDTH_BLOCK; j++) {
                 #pragma HLS UNROLL
+				#if (USE_TAIL == 1)
 				if (j < B_WIDTH_INT)
+				#endif
 				{
 					#ifdef simulation
 					if (acc2[j] < acc2_adj_min)
@@ -2655,7 +2667,9 @@ void compute1_1(bool gemm_mode,ap_int<8> zero_point_lhs,  ap_int<8> zero_point_r
 		LOOP_C_BUF1 : for (int j = 0; j < C_WIDTH_BLOCK; j++) {
 			//#pragma HLS loop_tripcount min=16 max=16 avg=16
 	           	#pragma HLS UNROLL
+			#if (USE_TAIL == 1)
 			if (j < B_WIDTH_INT)
+			#endif
 			{
 				//C_fifo[j].write(acc2[j]);
 				#ifdef simulation
@@ -2763,7 +2777,9 @@ void compute1_2(bool gemm_mode,ap_int<8> zero_point_lhs,  ap_int<8> zero_point_r
 		LOOP_C_BUF1 : for (int j = 0; j < C_WIDTH_BLOCK; j++) {
 			//#pragma HLS loop_tripcount min=16 max=16 avg=16
 	           	#pragma HLS UNROLL
+			#if (USE_TAIL == 1)
 			if (j < B_WIDTH_INT)
+			#endif
 			{
 				//C_fifo[j].write(acc2[j]);
 				#ifdef simulation
@@ -2867,7 +2883,9 @@ void compute1_4(bool gemm_mode,ap_int<8> zero_point_lhs,  ap_int<8> zero_point_r
 		LOOP_C_BUF1 : for (int j = 0; j < C_WIDTH_BLOCK; j++) {
 			//#pragma HLS loop_tripcount min=16 max=16 avg=16
 	           	#pragma HLS UNROLL
+			#if (USE_TAIL == 1)
 			if (j < B_WIDTH_INT)
+			#endif
 			{
 				//C_fifo[j].write(acc2[j]);
 				#ifdef simulation
