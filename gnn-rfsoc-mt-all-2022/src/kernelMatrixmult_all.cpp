@@ -2259,7 +2259,7 @@ void scale(ap_int<32> *quantized_multiplier, ap_int<32> *shift, ap_int<32> *bias
 }
 
 
-void compute2_4(int block_size,ap_int<8> zero_point_lhs,  ap_int<8> zero_point_rhs, int first_row, int row_count,hls::stream<ATYPE> &A_fifo, hls::stream<int> &col_indices_fifo, hls::stream<int> rnnz_fifo[SPMM_BLOCK], ITYPE B_accel1[B_HEIGHT/2][B_WIDTH_BLOCK],ITYPE B_accel2[B_HEIGHT/2][B_WIDTH_BLOCK],
+void compute2_4(bool relu,int block_size,ap_int<8> zero_point_lhs,  ap_int<8> zero_point_rhs, int first_row, int row_count,hls::stream<ATYPE> &A_fifo, hls::stream<int> &col_indices_fifo, hls::stream<int> rnnz_fifo[SPMM_BLOCK], ITYPE B_accel1[B_HEIGHT/2][B_WIDTH_BLOCK],ITYPE B_accel2[B_HEIGHT/2][B_WIDTH_BLOCK],
 ITYPE B_accel3[B_HEIGHT/4][B_WIDTH_BLOCK],ITYPE B_accel4[B_HEIGHT/4][B_WIDTH_BLOCK],
 hls::stream<ITYPE> C_fifo[B_WIDTH_BLOCK][SPMM_BLOCK],int B_index, int B_index_loop, int tail)
 {
@@ -2284,6 +2284,7 @@ hls::stream<ITYPE> C_fifo[B_WIDTH_BLOCK][SPMM_BLOCK],int B_index, int B_index_lo
 
 
 	      int B_WIDTH_INT;
+	        ITYPE C_fifo_val;
 
 	      if (B_index < (B_index_loop-1))
 			B_WIDTH_INT = B_WIDTH_BLOCK;
@@ -2350,7 +2351,11 @@ hls::stream<ITYPE> C_fifo[B_WIDTH_BLOCK][SPMM_BLOCK],int B_index, int B_index_lo
 									C_fifo[j][i].write(acc2[j][i]);
 								#endif
 								#if (USE_SBLOCKS == 0)
-									C_fifo[j][0].write(acc2[j][i]);
+									 if (acc2[j][i] > 0 || relu == 0)
+										C_fifo_val = acc2[j][i];
+									else
+										C_fifo_val = 0.0;
+									C_fifo[j][0].write(C_fifo_val);
 								#endif
 						}
 						////std::cout << "C_fifo " << acc2[j] << std::endl;
@@ -2473,7 +2478,7 @@ hls::stream<ITYPE> C_fifo[B_WIDTH_BLOCK][SPMM_BLOCK],int B_index, int B_index_lo
 
 }
 
-void compute2_1(int block_size,ap_int<8> zero_point_lhs,  ap_int<8> zero_point_rhs, int first_row, int row_count,hls::stream<ATYPE> &A_fifo, hls::stream<int> &col_indices_fifo, hls::stream<int> rnnz_fifo[SPMM_BLOCK], ITYPE B_accel1[B_HEIGHT/2][B_WIDTH_BLOCK],
+void compute2_1(bool relu,int block_size,ap_int<8> zero_point_lhs,  ap_int<8> zero_point_rhs, int first_row, int row_count,hls::stream<ATYPE> &A_fifo, hls::stream<int> &col_indices_fifo, hls::stream<int> rnnz_fifo[SPMM_BLOCK], ITYPE B_accel1[B_HEIGHT/2][B_WIDTH_BLOCK],
 		//ITYPE B_accel2[B_HEIGHT/2][B_WIDTH_BLOCK],
 		//ITYPE B_accel3[B_HEIGHT/4][B_WIDTH_BLOCK],ITYPE B_accel4[B_HEIGHT/4][B_WIDTH_BLOCK],
 hls::stream<ITYPE> C_fifo[B_WIDTH_BLOCK][SPMM_BLOCK],int B_index, int B_index_loop, int tail)
@@ -2574,7 +2579,11 @@ hls::stream<ITYPE> C_fifo[B_WIDTH_BLOCK][SPMM_BLOCK],int B_index, int B_index_lo
 									C_fifo[j][i].write(acc2[j][i]);
 								#endif
 								#if (USE_SBLOCKS == 0)
-									C_fifo[j][0].write(acc2[j][i]);
+								 if (acc2[j][i] > 0 || relu == 0)
+									C_fifo_val = acc2[j][i];
+								 else
+									C_fifo_val = 0.0;
+								 C_fifo[j][0].write(C_fifo_val);
 								#endif
 					}
 					////std::cout << "C_fifo " << acc2[j] << std::endl;
@@ -3447,7 +3456,7 @@ void loop_adj(bool relu,int *rowPtr_adj1,int *rowPtr_adj2,int *rowPtr_adj3,int *
 
 		 	    //std::cout << "COMPUTE2 " << std::endl;
 				#if FEA_THREADS == 1
-		 	    	compute2_1(N_adj_block,zero_point_lhs,  zero_point_rhs, first_row1,row_count1,A_fifo_adj1, col_indices_fifo_adj1, rnnz_fifo_adj1,C_adj11,
+		 	    	compute2_1(relu,N_adj_block,zero_point_lhs,  zero_point_rhs, first_row1,row_count1,A_fifo_adj1, col_indices_fifo_adj1, rnnz_fifo_adj1,C_adj11,
 		 	    		//C_adj21,
 		 	    		//C_adj31,C_adj41,
 		 	    		D_fifo1, B_index, B_index_loop, tail);
@@ -3529,11 +3538,11 @@ void loop_adj(bool relu,int *rowPtr_adj1,int *rowPtr_adj2,int *rowPtr_adj3,int *
 		#if FEA_THREADS == 4
 
 
-	   	compute2_4(N_adj_block_compute,zero_point_lhs,  zero_point_rhs, first_row1,row_count1,A_fifo_adj1, col_indices_fifo_adj1, rnnz_fifo_adj1,C_adj11,C_adj21,
+	   	compute2_4(relu,N_adj_block_compute,zero_point_lhs,  zero_point_rhs, first_row1,row_count1,A_fifo_adj1, col_indices_fifo_adj1, rnnz_fifo_adj1,C_adj11,C_adj21,
 	   	    		C_adj31,C_adj41,
 	   	    		D_fifo1, B_index, B_index_loop, tail);
 
-	    compute2_4(N_adj_block_compute,zero_point_lhs,  zero_point_rhs, first_row2,row_count2,A_fifo_adj2, col_indices_fifo_adj2, rnnz_fifo_adj2,C_adj12,C_adj22,
+	    compute2_4(relu,N_adj_block_compute,zero_point_lhs,  zero_point_rhs, first_row2,row_count2,A_fifo_adj2, col_indices_fifo_adj2, rnnz_fifo_adj2,C_adj12,C_adj22,
 	           		C_adj32,C_adj42,
 	           		D_fifo2, B_index, B_index_loop, tail);
 
@@ -3591,10 +3600,10 @@ void loop_adj(bool relu,int *rowPtr_adj1,int *rowPtr_adj2,int *rowPtr_adj3,int *
 
 	    //std::cout << "COMPUTE2 " << std::endl;
 
-	    compute2_4(N_adj_block,zero_point_lhs,  zero_point_rhs, first_row1,row_count1,A_fifo_adj1, col_indices_fifo_adj1, rnnz_fifo_adj1,C_adj11,C_adj21,C_adj31,C_adj41,D_fifo1, B_index, B_index_loop, tail);
-        compute2_4(N_adj_block,zero_point_lhs,  zero_point_rhs, first_row2,row_count2,A_fifo_adj2, col_indices_fifo_adj2, rnnz_fifo_adj2,C_adj12,C_adj22,C_adj32,C_adj42,D_fifo2, B_index, B_index_loop, tail);
-        compute2_4(N_adj_block,zero_point_lhs,  zero_point_rhs, first_row3,row_count3,A_fifo_adj3, col_indices_fifo_adj3, rnnz_fifo_adj3,C_adj13,C_adj23,C_adj33,C_adj43,D_fifo3, B_index, B_index_loop, tail);
-        compute2_4(N_adj_block,zero_point_lhs,  zero_point_rhs, first_row4,row_count4,A_fifo_adj4, col_indices_fifo_adj4, rnnz_fifo_adj4,C_adj14,C_adj24,C_adj34,C_adj44,D_fifo4, B_index, B_index_loop, tail);
+	    compute2_4(relu,N_adj_block,zero_point_lhs,  zero_point_rhs, first_row1,row_count1,A_fifo_adj1, col_indices_fifo_adj1, rnnz_fifo_adj1,C_adj11,C_adj21,C_adj31,C_adj41,D_fifo1, B_index, B_index_loop, tail);
+        compute2_4(relu,N_adj_block,zero_point_lhs,  zero_point_rhs, first_row2,row_count2,A_fifo_adj2, col_indices_fifo_adj2, rnnz_fifo_adj2,C_adj12,C_adj22,C_adj32,C_adj42,D_fifo2, B_index, B_index_loop, tail);
+        compute2_4(relu,N_adj_block,zero_point_lhs,  zero_point_rhs, first_row3,row_count3,A_fifo_adj3, col_indices_fifo_adj3, rnnz_fifo_adj3,C_adj13,C_adj23,C_adj33,C_adj43,D_fifo3, B_index, B_index_loop, tail);
+        compute2_4(relu,N_adj_block,zero_point_lhs,  zero_point_rhs, first_row4,row_count4,A_fifo_adj4, col_indices_fifo_adj4, rnnz_fifo_adj4,C_adj14,C_adj24,C_adj34,C_adj44,D_fifo4, B_index, B_index_loop, tail);
 
 	    writec(relu,first_row1,row_count1,P_w, D_fifo1, D1,B_index,B_index_loop, tail);
 	    writec(relu,first_row2,row_count2,P_w, D_fifo2, D2,B_index,B_index_loop, tail);
