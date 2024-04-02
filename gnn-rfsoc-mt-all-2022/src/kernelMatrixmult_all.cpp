@@ -767,10 +767,10 @@ void writec(bool relu,int first_row, int row_count,int P, hls::stream<ITYPE> wri
 							#if (USE_RELU == 1)
 						    if(j<B_WIDTH_INT)
 			    			{
-						    	if (C_out > 0 || relu == 0)
+						    	//if (C_out > 0 || relu == 0)
 						    		C[(i+z)*P+j+B_index*B_WIDTH_BLOCK] = C_out;
-						    	else
-						    		C[(i+z)*P+j+B_index*B_WIDTH_BLOCK] = 0.0;
+						    	//else
+						    	//	C[(i+z)*P+j+B_index*B_WIDTH_BLOCK] = 0.0;
 						    }
 							#else
 					    		 C[(i+z)*P+j+B_index*B_WIDTH_BLOCK] = C_out;
