@@ -144,4 +144,8 @@ Running test
 
 Epoch: 011, Train Acc: 0.7234, Test Acc: 0.7600  
 
+If you find this repository useful for your research, please, consider citing:
+
+Jose Nunez-Yanez. 2023. Accelerating Graph Neural Networks in Pytorch with HLS and Deep Dataflows. In Applied Reconfigurable Computing. Architectures, Tools, and Applications: 19th International Symposium, ARC 2023, Cottbus, Germany, September 27–29, 2023, Proceedings. Springer-Verlag, Berlin, Heidelberg, 131–145. https://doi.org/10.1007/978-3-031-42921-7_9
+
 
