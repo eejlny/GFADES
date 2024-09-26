@@ -81,6 +81,7 @@ Also, you can open and work with the projects using the GUI for Vitis HLS and VI
 
 VITIS HLS: ./gnn
 
+
 VIVADO: ./<project_name/
 
 The jupyter directory contains a test jupyter notebook that can be used to test the design in the PYNQ FPGA board
