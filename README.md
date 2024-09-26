@@ -28,6 +28,7 @@ The compute unit always uses sblocks, sblocks groups multiple adj sparse rows in
 The USE_SBLOCKS controls if the write unit also uses sblocks and reads multiple FIFO channels comming from the compute unit 
 or reads only one FIFO channel per core and this is generally better because it optimizes the loop that writes data to memory.
 
+#define SPMM_BLOCK 1
 #define USE_SBLOCKS 0
 
 IF use_tail is set to 0 then the tail has to be zero so the division bewtween the number of weight columns (number of hidden units or neurons) and the number of compute units needs to be integer
@@ -37,15 +38,13 @@ so  P_w (width of weight matrix) has to be 16, 34, 64 etc but NOT 21. If weight 
 
 recommended that USE_SBLOCKS is 0 and USE_TAIL 0 for performance
 
-now go to hls solution directory
+now from the download directory perform HLS simulation, HLS synthesis and IP export with this command:
 
-**cd ..../workspace/gnn-rfsoc-mt-all-2022/hls/gnn/solution1**
+**vitis_hls -f ./gnn-rfsoc-mt-all-2022/hls/gnn/solution1/script.tcl**
 
 Check script.tcl to make sure that the set_part command matches your device is correct or modify as needed.
 The default part is xczu27dr-ffve1156-2-i that is the FPGA available in an RFSOC2x2 board.
-Perform HLS simulation, HLS synthesis and IP export with this command:
 
-**vitis_hls -f script.tcl**
 
 HLS simulation should display results like this:
 
@@ -69,25 +68,20 @@ out :data index= 0 8 kernel = 0.114624
 
 out :data index= 0 9 kernel = 0.71582
 
-Then wait for HLS synthesis and IP export to complete.
-once this is done go to Vivado script directory
+Once HLS synthesis and IP export has completed launch implementation and bitstream generation with this command:
 
-**cd ..../workspace**
+**vivado -mode batch -source project_1.tcl**
 
-Modify this line as needed in project_1.tcl to set a new project name/directory 
+Optionally modify this line as needed in project_1.tcl to set a new project name/directory 
 
 **set _xil_proj_name_ "1t1t2c"**
 
-RTL implementation and bitstream generation
-
-**vivado -mode batch -source project_1.tcl**  
-
-after completion all results are available under the new project name directory. 
+After completion all results are available under the new project name directory. 
 Also, you can open and work with the projects using the GUI for Vitis HLS and VIVADO located at: 
 
-VITIS HLS: ..../workspace/gnn-rfsoc-mt-all-2022/hls/gnn
+VITIS HLS: ./gnn
 
-VIVADO: ..../workspace/<project_name/
+VIVADO: ./<project_name/
 
 The jupyter directory contains a test jupyter notebook that can be used to test the design in the PYNQ FPGA board
 and measure performance.  The jupyter notebook sets all the control registers for the pynq buffers. In addition it sets
@@ -109,40 +103,9 @@ of obtaining a csr matrix at run-time unfeasible.
 
 The Jupyter directory also contains a full GCN network for molecule graph classification that uses the accelerator during training. It requires torch_geometric==2.0.1 installed on the board.
 The notebook currently offloads the forward passes to the FPGA for both layers and contains a custom backward path that uses tensors saved from the hardware. T
-Future work invoves offloading the backward path calculations. The training loops shows as follows:  
+Future work invoves offloading the backward path calculations. The training loop should reach 0.76 accuracy around epoch 36.  
 
-
-Epoch: 006, Train Acc: 0.6649, Test Acc: 0.6200
-
-Running train
-
-Running test
-
-Epoch: 007, Train Acc: 0.6649, Test Acc: 0.6200
-
-Running train
-
-Running test
-
-Epoch: 008, Train Acc: 0.6755, Test Acc: 0.6200
-
-Running train
-
-Running test
-
-Epoch: 009, Train Acc: 0.7394, Test Acc: 0.7600
-
-Running train
-
-Running test
-
-Epoch: 010, Train Acc: 0.7074, Test Acc: 0.7400
-
-Running train
-
-Running test
-
-Epoch: 011, Train Acc: 0.7234, Test Acc: 0.7600  
+ 
 
 If you find this repository useful for your research, please, consider citing:
 

@@ -163,10 +163,10 @@
 //	typedef float FTYPE;
 //#endif
 
-#define FEA_THREADS 4
-#define ADJ_THREADS 4
+#define FEA_THREADS 1
+#define ADJ_THREADS 1
 
-#define SPMM_BLOCK 4
+#define SPMM_BLOCK 1
 #define USE_SBLOCKS 0
 
 /*the compute unit always uses sblocks, the USE_SBLOCKS controls if the write unit also uses sblocks and reads multiple FIFO channels
@@ -191,8 +191,8 @@
  */
 
 #define A_HEIGHT_BLOCK  1// 4096 //(512/4)
-#define B_WIDTH_BLOCK 8 //the width of compute1 BLOCK BUFFER A*B = C 16 //32 //64 //64 //128 // 64 //64 //64 //8//8// //16//32//1//32//1//32//1// 1//32//(128/4)
-#define C_WIDTH_BLOCK 8 //the width of compute2 BLOCK BUFFER C*D = F
+#define B_WIDTH_BLOCK 2 //the width of compute1 BLOCK BUFFER A*B = C 16 //32 //64 //64 //128 // 64 //64 //64 //8//8// //16//32//1//32//1//32//1// 1//32//(128/4)
+#define C_WIDTH_BLOCK 2 //the width of compute2 BLOCK BUFFER C*D = F
 #define B_BLOCK_PARALLEL 1
 //#define PES_ADJ 2 // Number of PEs for ADJ processing
 //#define PES_FEA 2 // Number iof PEs for FEA processing

@@ -2511,6 +2511,7 @@ hls::stream<ITYPE> C_fifo[B_WIDTH_BLOCK][SPMM_BLOCK],int B_index, int B_index_lo
 
 
       int B_WIDTH_INT;
+      ITYPE C_fifo_val;
 
       if (B_index < (B_index_loop-1))
 		B_WIDTH_INT = B_WIDTH_BLOCK;

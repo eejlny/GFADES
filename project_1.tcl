@@ -35,7 +35,7 @@
 proc checkRequiredFiles { origin_dir} {
   set status true
   set paths [list \
- "[file normalize "$origin_dir/../AppData/Roaming/Xilinx/Vivado/workspace/gnn-rfsoc-mt-all-2022/hls/gnn"]"]"\
+ "[file normalize "$origin_dir/gnn"]"]"\
   ]
   foreach ipath $paths {
     if { ![file isdirectory $ipath] } {
@@ -55,7 +55,7 @@ if { [info exists ::origin_dir_loc] } {
 }
 
 # Set the project name
-set _xil_proj_name_ "4t4t12c"
+set _xil_proj_name_ "1t1t2c"
 
 # Use project name variable, if specified in the tcl shell
 if { [info exists ::user_project_name] } {
@@ -111,7 +111,7 @@ if { $::argc > 0 } {
 }
 
 # Set the directory path for the original project from where this script was exported
-set orig_proj_dir "[file normalize "$origin_dir/../workspace/gnn-rfsoc-mt-all-2022/vivado/project_1"]"
+set orig_proj_dir "[file normalize "$origin_dir/gnn-rfsoc-mt-all-2022/vivado/project_1"]"
 
 # Check for paths and files needed for project creation
 set validate_required 0
@@ -154,7 +154,7 @@ if {[string equal [get_filesets -quiet sources_1] ""]} {
 # Set IP repository paths
 set obj [get_filesets sources_1]
 if { $obj != {} } {
-   set_property "ip_repo_paths" "[file normalize "$origin_dir/../workspace/gnn-rfsoc-mt-all-2022/hls/gnn"]" $obj
+   set_property "ip_repo_paths" "[file normalize "$origin_dir/gnn"]" $obj
 
    # Rebuild user ip_repo's index before adding any source files
    update_ip_catalog -rebuild
@@ -2195,7 +2195,6 @@ if { $obj != "" } {
 set obj [get_runs synth_1]
 set_property -name "needs_refresh" -value "1" -objects $obj
 set_property -name "part" -value "xczu28dr-ffvg1517-2-e" -objects $obj
-set_property -name "auto_incremental_checkpoint.directory" -value "C:/Users/josnu02/workspace/gnn-us/vivado/project_1/project_1.srcs/utils_1/imports/synth_1" -objects $obj
 set_property -name "strategy" -value "Vivado Synthesis Defaults" -objects $obj
 
 # set the current synth run
@@ -2411,8 +2410,6 @@ set_property -name "options.warn_on_violation" -value "1" -objects $obj
 set obj [get_runs impl_1]
 set_property -name "needs_refresh" -value "1" -objects $obj
 set_property -name "part" -value "xczu28dr-ffvg1517-2-e" -objects $obj
-set_property -name "auto_rqs.directory" -value "C:/Users/josnu02/workspace/gnn-rfsoc-mt-2022/vivado/project_1/project_1.srcs/utils_1/imports/impl_1" -objects $obj
-set_property -name "auto_incremental_checkpoint.directory" -value "C:/Users/josnu02/workspace/gnn-us/vivado/project_1/project_1.srcs/utils_1/imports/impl_1" -objects $obj
 set_property -name "strategy" -value "Vivado Implementation Defaults" -objects $obj
 set_property -name "steps.write_bitstream.args.readback_file" -value "0" -objects $obj
 set_property -name "steps.write_bitstream.args.verbose" -value "0" -objects $obj

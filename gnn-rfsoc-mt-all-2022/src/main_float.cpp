@@ -43,13 +43,13 @@ int M_fea = 7;  // number of input features
 int P_w = 32;  // number of features in the hidden layer
 int NNZ_adj = 5028;  // number of non-zero values of adjacency
 int NNZ_fea = 2273;  // number of non-zero values of feature
-static const std::string adj_name = "C:/Users/josnu02/workspace/gnn-z2/data/matrices/mol_adj.txt";
+static const std::string adj_name = "/home/josnu02/projects/gfades_test/GFADES/gnn-rfsoc-mt-all-2022/data/matrices/mol_adj.txt";
 #if (use_gemm == 0)
-	static const std::string fea_name = "C:/Users/josnu02/workspace/gnn-z2/data/matrices/mol_feat.txt";
+	static const std::string fea_name = "/home/josnu02/projects/gfades_test/GFADES/gnn-rfsoc-mt-all-2022/data/matrices/mol_feat.txt";
 #else
-	static const std::string fea_name = "C:/Users/josnu02/workspace/gnn-z2/data/matrices/mol_feat_dense.txt";
+	static const std::string fea_name = "/home/josnu02/projects/gfades_test/GFADES/gnn-rfsoc-mt-all-2022/data/matrices/mol_feat_dense.txt";
 #endif
-static const std::string w_name = "C:/Users/josnu02/workspace/gnn-z2/data/matrices/mol_weights.txt";
+static const std::string w_name = "/home/josnu02/projects/gfades_test/GFADES/gnn-rfsoc-mt-all-2022/data/matrices/mol_weights.txt";
 #endif
 
 #ifdef citeseer_mod
