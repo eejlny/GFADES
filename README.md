@@ -41,6 +41,8 @@ recommended that USE_SBLOCKS is 0 and USE_TAIL 0 for performance
 
 now from the download directory perform HLS simulation, HLS synthesis and IP export with this command:
 
+Before launching this command update the data file paths (e.g:/home/josnu02/projects/gfades_test/GFADES/gnn-rfsoc-mt-all-2022/data/matrices/mol_adj.txt) in main_float.cpp according to your directories.
+
 **vitis_hls -f ./gnn-rfsoc-mt-all-2022/hls/gnn/solution1/script.tcl**
 
 Check script.tcl to make sure that the set_part command matches your device is correct or modify as needed.
