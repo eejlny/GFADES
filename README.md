@@ -29,6 +29,7 @@ The USE_SBLOCKS controls if the write unit also uses sblocks and reads multiple 
 or reads only one FIFO channel per core and this is generally better because it optimizes the loop that writes data to memory.
 
 #define SPMM_BLOCK 1
+
 #define USE_SBLOCKS 0
 
 IF use_tail is set to 0 then the tail has to be zero so the division bewtween the number of weight columns (number of hidden units or neurons) and the number of compute units needs to be integer
