@@ -2576,6 +2576,7 @@ hls::stream<ITYPE> C_fifo[B_WIDTH_BLOCK][SPMM_BLOCK],int B_index, int B_index_lo
 						LOOP_C_BUF2 : for (int i = 0; i < SPMM_BLOCK; i++) {
 							#pragma HLS UNROLL
 							if (i<crows)
+							{
 								#if (USE_SBLOCKS == 1)
 									C_fifo[j][i].write(acc2[j][i]);
 								#endif
@@ -2586,6 +2587,7 @@ hls::stream<ITYPE> C_fifo[B_WIDTH_BLOCK][SPMM_BLOCK],int B_index, int B_index_lo
 									C_fifo_val = 0.0;
 								 C_fifo[j][0].write(C_fifo_val);
 								#endif
+							}
 					}
 					////std::cout << "C_fifo " << acc2[j] << std::endl;
 
